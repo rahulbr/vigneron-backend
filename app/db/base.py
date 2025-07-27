@@ -1,13 +1,8 @@
 import os
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
-
-# Import all models to ensure they are registered with SQLAlchemy
-from app.models.base import Base
-from app.models.user import User
-from app.models.ai_model import AIModel
-from app.models.inference_request import InferenceRequest
 
 load_dotenv()
 
@@ -15,6 +10,8 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localho
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 
 def get_db():
