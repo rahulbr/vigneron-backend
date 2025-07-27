@@ -9,6 +9,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
 # Set up CORS
 app.add_middleware(
     CORSMiddleware,
@@ -18,14 +19,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include API router
 app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/")
-async def root():
-    return {"message": "Vigneron AI Backend API", "version": "1.0.0"}
-
+def root():
+    return {"message": "Vigneron AI Backend"}
 
 @app.get("/health")
-async def health_check():
+def health_check():
     return {"status": "healthy"}

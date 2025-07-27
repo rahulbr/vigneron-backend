@@ -1,25 +1,23 @@
-"""
-User SQLAlchemy model.
-"""
-from sqlalchemy import Boolean, Column, String
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from app.db.base import Base
 
-from .base import Base, TimestampMixin, UUIDMixin
-
-
-class User(Base, UUIDMixin, TimestampMixin):
-    """User model."""
-    
+class User(Base):
     __tablename__ = "users"
     
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    full_name = Column(String(100), nullable=False)
-    hashed_password = Column(String(255), nullable=False)
-    is_active = Column(Boolean, default=True, nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    role = Column(String(50), default='worker')  # 'owner', 'manager', 'worker', 'consultant'
+    phone = Column(String(20))
+    is_active = Column(Boolean, default=True)
+    last_login_at = Column(DateTime(timezone=True))
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relationships
-    ai_models = relationship("AIModel", back_populates="owner", cascade="all, delete-orphan")
-    inference_requests = relationship("InferenceRequest", back_populates="user")
-    
-    def __repr__(self) -> str:
-        return f"<User(id={self.id}, email={self.email})>"
+    organization = relationship("Organization", back_populates="users")
