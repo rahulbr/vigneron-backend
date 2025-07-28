@@ -2,7 +2,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, JSON, DECIMAL, ForeignKey
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship
-from geoalchemy2 import Geometry 
 from sqlalchemy.sql import func
 from app.db.base import Base
 
@@ -17,16 +16,23 @@ class Block(Base):
     crop_type = Column(ENUM('grape', 'apple', 'cherry', 'pear', 'coffee', 'avocado', 'citrus', 'stone_fruit', 'berry', 'nut', 'other', name='crop_type_enum'), nullable=False)
     variety = Column(String(50))  # Crop variety/cultivar
     
-    # Planting details
+    # Enhanced genetics tracking
     primary_variety = Column(String(50))
     primary_clone = Column(String(50))
     primary_rootstock = Column(String(50))
     mixed_genetics = Column(Boolean, default=False)
+    
+    # Physical layout
     row_count = Column(Integer)
     row_spacing_ft = Column(DECIMAL(5,2))
     vine_spacing_ft = Column(DECIMAL(5,2))
-    gps_center_point = Column(Geometry('POINT'))
-    gps_boundary = Column(Geometry('POLYGON'))
+    
+    # GPS location using simple lat/lng
+    center_latitude = Column(DECIMAL(10,8))
+    center_longitude = Column(DECIMAL(11,8))
+    boundary_radius_meters = Column(DECIMAL(10,2))  # Radius for circular boundary
+    
+    # Planting details (keeping existing fields)
     rootstock = Column(String(50))
     clone = Column(String(50))
     planting_year = Column(Integer)

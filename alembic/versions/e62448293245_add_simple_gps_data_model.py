@@ -1,8 +1,8 @@
-"""add_revised_data_model_v1_1
+"""add_simple_gps_data_model
 
-Revision ID: 98cd887f3634
+Revision ID: e62448293245
 Revises: 392fbcb95244
-Create Date: 2025-07-28 07:54:52.986206
+Create Date: 2025-07-28 08:53:06.018208
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '98cd887f3634'
+revision: str = 'e62448293245'
 down_revision: Union[str, None] = '392fbcb95244'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -80,16 +80,16 @@ def upgrade() -> None:
     sa.Column('training_method', sa.String(length=100), nullable=True),
     sa.Column('wire_count', sa.Integer(), nullable=True),
     sa.Column('post_spacing_ft', sa.DECIMAL(precision=5, scale=2), nullable=True),
-    sa.Column('gps_start_point', geoalchemy2.types.Geometry(geometry_type='POINT', dimension=2, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True),
-    sa.Column('gps_end_point', geoalchemy2.types.Geometry(geometry_type='POINT', dimension=2, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True),
+    sa.Column('start_latitude', sa.DECIMAL(precision=10, scale=8), nullable=True),
+    sa.Column('start_longitude', sa.DECIMAL(precision=11, scale=8), nullable=True),
+    sa.Column('end_latitude', sa.DECIMAL(precision=10, scale=8), nullable=True),
+    sa.Column('end_longitude', sa.DECIMAL(precision=11, scale=8), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.ForeignKeyConstraint(['block_id'], ['blocks.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('idx_rows_gps_end_point', 'rows', ['gps_end_point'], unique=False, postgresql_using='gist')
-    op.create_index('idx_rows_gps_start_point', 'rows', ['gps_start_point'], unique=False, postgresql_using='gist')
     op.create_index(op.f('ix_rows_id'), 'rows', ['id'], unique=False)
     op.create_table('individual_vines',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -110,14 +110,14 @@ def upgrade() -> None:
     sa.Column('canopy_vigor', sa.String(length=20), nullable=True),
     sa.Column('fruit_quality_rating', sa.String(length=20), nullable=True),
     sa.Column('historical_yield_kg', sa.DECIMAL(precision=6, scale=2), nullable=True),
-    sa.Column('gps_coordinates', geoalchemy2.types.Geometry(geometry_type='POINT', dimension=2, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True),
+    sa.Column('latitude', sa.DECIMAL(precision=10, scale=8), nullable=True),
+    sa.Column('longitude', sa.DECIMAL(precision=11, scale=8), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.ForeignKeyConstraint(['row_id'], ['rows.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('idx_individual_vines_gps_coordinates', 'individual_vines', ['gps_coordinates'], unique=False, postgresql_using='gist')
     op.create_index(op.f('ix_individual_vines_id'), 'individual_vines', ['id'], unique=False)
     op.add_column('blocks', sa.Column('primary_variety', sa.String(length=50), nullable=True))
     op.add_column('blocks', sa.Column('primary_clone', sa.String(length=50), nullable=True))
@@ -126,37 +126,37 @@ def upgrade() -> None:
     op.add_column('blocks', sa.Column('row_count', sa.Integer(), nullable=True))
     op.add_column('blocks', sa.Column('row_spacing_ft', sa.DECIMAL(precision=5, scale=2), nullable=True))
     op.add_column('blocks', sa.Column('vine_spacing_ft', sa.DECIMAL(precision=5, scale=2), nullable=True))
-    op.add_column('blocks', sa.Column('gps_center_point', geoalchemy2.types.Geometry(geometry_type='POINT', dimension=2, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True))
-    op.add_column('blocks', sa.Column('gps_boundary', geoalchemy2.types.Geometry(geometry_type='POLYGON', dimension=2, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True))
+    op.add_column('blocks', sa.Column('center_latitude', sa.DECIMAL(precision=10, scale=8), nullable=True))
+    op.add_column('blocks', sa.Column('center_longitude', sa.DECIMAL(precision=11, scale=8), nullable=True))
+    op.add_column('blocks', sa.Column('boundary_radius_meters', sa.DECIMAL(precision=10, scale=2), nullable=True))
     op.add_column('blocks', sa.Column('training_method', sa.String(length=100), nullable=True))
     op.alter_column('blocks', 'trellis_system',
                existing_type=sa.VARCHAR(length=50),
                type_=sa.String(length=100),
                existing_nullable=True)
-    op.create_index('idx_blocks_gps_boundary', 'blocks', ['gps_boundary'], unique=False, postgresql_using='gist')
-    op.create_index('idx_blocks_gps_center_point', 'blocks', ['gps_center_point'], unique=False, postgresql_using='gist')
     op.add_column('properties', sa.Column('default_trellis_system', sa.String(length=100), nullable=True))
     op.add_column('properties', sa.Column('default_training_method', sa.String(length=100), nullable=True))
-    op.add_column('properties', sa.Column('gps_boundary', geoalchemy2.types.Geometry(geometry_type='POLYGON', dimension=2, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True))
-    op.create_index('idx_properties_gps_boundary', 'properties', ['gps_boundary'], unique=False, postgresql_using='gist')
+    op.add_column('properties', sa.Column('boundary_center_lat', sa.DECIMAL(precision=10, scale=8), nullable=True))
+    op.add_column('properties', sa.Column('boundary_center_lng', sa.DECIMAL(precision=11, scale=8), nullable=True))
+    op.add_column('properties', sa.Column('boundary_radius_meters', sa.DECIMAL(precision=10, scale=2), nullable=True))
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index('idx_properties_gps_boundary', table_name='properties', postgresql_using='gist')
-    op.drop_column('properties', 'gps_boundary')
+    op.drop_column('properties', 'boundary_radius_meters')
+    op.drop_column('properties', 'boundary_center_lng')
+    op.drop_column('properties', 'boundary_center_lat')
     op.drop_column('properties', 'default_training_method')
     op.drop_column('properties', 'default_trellis_system')
-    op.drop_index('idx_blocks_gps_center_point', table_name='blocks', postgresql_using='gist')
-    op.drop_index('idx_blocks_gps_boundary', table_name='blocks', postgresql_using='gist')
     op.alter_column('blocks', 'trellis_system',
                existing_type=sa.String(length=100),
                type_=sa.VARCHAR(length=50),
                existing_nullable=True)
     op.drop_column('blocks', 'training_method')
-    op.drop_column('blocks', 'gps_boundary')
-    op.drop_column('blocks', 'gps_center_point')
+    op.drop_column('blocks', 'boundary_radius_meters')
+    op.drop_column('blocks', 'center_longitude')
+    op.drop_column('blocks', 'center_latitude')
     op.drop_column('blocks', 'vine_spacing_ft')
     op.drop_column('blocks', 'row_spacing_ft')
     op.drop_column('blocks', 'row_count')
@@ -165,11 +165,8 @@ def downgrade() -> None:
     op.drop_column('blocks', 'primary_clone')
     op.drop_column('blocks', 'primary_variety')
     op.drop_index(op.f('ix_individual_vines_id'), table_name='individual_vines')
-    op.drop_index('idx_individual_vines_gps_coordinates', table_name='individual_vines', postgresql_using='gist')
     op.drop_table('individual_vines')
     op.drop_index(op.f('ix_rows_id'), table_name='rows')
-    op.drop_index('idx_rows_gps_start_point', table_name='rows', postgresql_using='gist')
-    op.drop_index('idx_rows_gps_end_point', table_name='rows', postgresql_using='gist')
     op.drop_table('rows')
     op.drop_index(op.f('ix_financial_transactions_id'), table_name='financial_transactions')
     op.drop_table('financial_transactions')

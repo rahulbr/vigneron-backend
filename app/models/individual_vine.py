@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, DECIMAL, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from geoalchemy2 import Geometry
 from app.db.base import Base
 
 class IndividualVine(Base):
@@ -32,8 +31,9 @@ class IndividualVine(Base):
     fruit_quality_rating = Column(String(20))
     historical_yield_kg = Column(DECIMAL(6,2))
     
-    # GPS
-    gps_coordinates = Column(Geometry('POINT'))
+    # GPS using simple lat/lng
+    latitude = Column(DECIMAL(10,8))
+    longitude = Column(DECIMAL(11,8))
     
     # Status
     is_active = Column(Boolean, default=True)

@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, DECIMAL, ForeignKey, Time
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, DECIMAL, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from geoalchemy2 import Geometry
 from app.db.base import Base
 
 class Row(Base):
@@ -24,9 +23,11 @@ class Row(Base):
     wire_count = Column(Integer)
     post_spacing_ft = Column(DECIMAL(5,2))
     
-    # GPS
-    gps_start_point = Column(Geometry('POINT'))
-    gps_end_point = Column(Geometry('POINT'))
+    # GPS using simple lat/lng points
+    start_latitude = Column(DECIMAL(10,8))
+    start_longitude = Column(DECIMAL(11,8))
+    end_latitude = Column(DECIMAL(10,8))
+    end_longitude = Column(DECIMAL(11,8))
     
     # Status
     is_active = Column(Boolean, default=True)
