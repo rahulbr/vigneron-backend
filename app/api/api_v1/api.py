@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.api.api_v1.endpoints import health, models 
 from app.api.api_v1.endpoints import organizations, properties, blocks
+from app.api.api_v1.endpoints import mobile
 
 
 api_router = APIRouter()
@@ -23,3 +24,4 @@ api_router.include_router(
     prefix="/blocks",
     tags=["blocks"]
 )
+api_router.include_router(mobile.router, prefix="/mobile", tags=["mobile"])

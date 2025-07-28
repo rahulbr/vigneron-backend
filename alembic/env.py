@@ -19,7 +19,7 @@ from app.models.block import Block
 config = context.config
 
 # Set the database URL from environment
-config.set_main_option('sqlalchemy.url', os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost:54322/postgres'))
+config.set_main_option('sqlalchemy.url', os.getenv('DATABASE_URL', 'postgresql://postgres:@localhost:5432/vigneron_backend'))
 
 # Interpret the config file for Python logging
 if config.config_file_name is not None:
