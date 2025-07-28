@@ -1,4 +1,3 @@
-# Replace the entire alembic/env.py with this clean version:
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -11,9 +10,16 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 # Import your models
 from app.db.base import Base
-from app.models.organization import Organization  # Import all your new models
+from app.models.organization import Organization
 from app.models.property import Property
 from app.models.block import Block
+from app.models.row import Row
+from app.models.individual_vine import IndividualVine
+from app.models.user import User
+from app.models.activity import Activity
+from app.models.crop_specific_data import CropSpecificData
+from app.models.spray_product import SprayProduct
+from app.models.financial_transaction import FinancialTransaction
 
 # this is the Alembic Config object
 config = context.config
@@ -36,6 +42,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
@@ -52,7 +60,9 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=target_metadata
+            target_metadata=target_metadata,
+            compare_type=True,
+            compare_server_default=True,
         )
 
         with context.begin_transaction():
