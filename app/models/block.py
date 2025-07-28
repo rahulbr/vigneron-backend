@@ -2,6 +2,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, JSON, DECIMAL, ForeignKey
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship
+from geoalchemy2 import Geometry 
 from sqlalchemy.sql import func
 from app.db.base import Base
 
@@ -17,13 +18,23 @@ class Block(Base):
     variety = Column(String(50))  # Crop variety/cultivar
     
     # Planting details
+    primary_variety = Column(String(50))
+    primary_clone = Column(String(50))
+    primary_rootstock = Column(String(50))
+    mixed_genetics = Column(Boolean, default=False)
+    row_count = Column(Integer)
+    row_spacing_ft = Column(DECIMAL(5,2))
+    vine_spacing_ft = Column(DECIMAL(5,2))
+    gps_center_point = Column(Geometry('POINT'))
+    gps_boundary = Column(Geometry('POLYGON'))
     rootstock = Column(String(50))
     clone = Column(String(50))
     planting_year = Column(Integer)
     planting_density = Column(Integer)  # Plants per acre
     
     # Management details
-    trellis_system = Column(String(50))
+    trellis_system = Column(String(100))
+    training_method = Column(String(100))
     harvest_method = Column(ENUM('hand_picked', 'machine_harvested', 'strip_picked', 'selective_pick', name='harvest_method_enum'))
     processing_type = Column(String(100))  # Intended use (fresh, juice, dried, etc.)
     
@@ -44,3 +55,4 @@ class Block(Base):
     # Relationships
     property = relationship("Property", back_populates="blocks")
     activities = relationship("Activity", back_populates="block")
+    rows = relationship("Row", back_populates="block")

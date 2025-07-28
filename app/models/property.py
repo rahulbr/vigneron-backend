@@ -2,6 +2,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, JSON, DECIMAL, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, ENUM
 from sqlalchemy.orm import relationship
+from geoalchemy2 import Geometry
 from sqlalchemy.sql import func
 from app.db.base import Base
 
@@ -16,6 +17,9 @@ class Property(Base):
     # Context-aware fields
     primary_crops = Column(JSON)  # ['coffee', 'macadamia'] for this specific property
     business_functions = Column(JSON)  # ['processing', 'direct_sales', 'agritourism']
+    default_trellis_system = Column(String(100))
+    default_training_method = Column(String(100))
+    gps_boundary = Column(Geometry('POLYGON'))    
     
     # Location data
     street_address = Column(Text)
@@ -26,7 +30,7 @@ class Property(Base):
     latitude = Column(DECIMAL(10,8))
     longitude = Column(DECIMAL(11,8))
     elevation_ft = Column(Integer)
-    
+    gps_boundary = Column(Geometry('POLYGON'))
     # Operational data
     total_acres = Column(DECIMAL(8,2))
     planted_acres = Column(DECIMAL(8,2))
